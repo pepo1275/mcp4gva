@@ -1,8 +1,23 @@
 # MCP4GVA - MCP Server para GVA GIS
 
-Servidor MCP (Model Context Protocol) mínimo para acceder a la API de GVA GIS (Generalitat Valenciana) - Servicio de Suelo de Actividades.
+Servidor MCP (Model Context Protocol) para acceder a la API de GVA GIS (Generalitat Valenciana) - Servicio de Suelo de Actividades.
 
 **Endpoint:** `https://gvagis.icv.gva.es/server/rest/services/Hosted/Suelo_actividades/FeatureServer/2`
+
+## 🎯 Dos Implementaciones Disponibles
+
+Este repositorio contiene **dos versiones** del mismo servidor MCP para que puedas comparar y aprender:
+
+| Versión | Ubicación | Runtime | Comando |
+|---------|-----------|---------|---------|
+| **🐍 Python** | Directorio raíz | Python 3.10+ | `uvx` |
+| **📘 TypeScript** | `typescript/` | Node.js 18+ | `npx` |
+
+**📊 Ver [COMPARISON.md](COMPARISON.md) para una comparación detallada lado a lado**
+
+---
+
+# Python Version (este directorio)
 
 ## ¿Qué es esto?
 

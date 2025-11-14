@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp4gva-typescript": {
+      "command": "npx",
+      "args": ["-y", "mcp4gva-typescript"]
+    }
+  }
+}
