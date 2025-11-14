@@ -10,18 +10,26 @@ Un servidor MCP que expone la API de ArcGIS REST de la Generalitat Valenciana pa
 
 ## Instalación
 
-### 1. Instalar el paquete
+### Requisito previo: Instalar `uv`
+
+Primero necesitas tener `uv` instalado:
 
 ```bash
-# Opción 1: Instalación en desarrollo
-cd mcp4gva
-pip install -e .
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Opción 2: Instalar dependencias manualmente
-pip install mcp>=0.9.0 requests>=2.31.0
+# Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# O con pip
+pip install uv
 ```
 
-### 2. Configurar Claude Desktop
+### Opción 1: Usar con `uvx` (RECOMENDADO)
+
+Esta es la forma más simple - no requiere instalación local. Claude Desktop descargará y ejecutará automáticamente.
+
+#### Configurar Claude Desktop
 
 Edita el archivo de configuración de Claude Desktop:
 
@@ -29,32 +37,62 @@ Edita el archivo de configuración de Claude Desktop:
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
-Añade la configuración del servidor MCP:
+Añade esta configuración:
 
 ```json
 {
   "mcpServers": {
     "mcp4gva": {
-      "command": "python",
+      "command": "uvx",
+      "args": ["mcp4gva"]
+    }
+  }
+}
+```
+
+**Nota:** Para usar esta opción, el paquete debe estar publicado en PyPI. Para desarrollo local, usa la Opción 2.
+
+### Opción 2: Desarrollo local con `uvx`
+
+Si estás desarrollando o modificando el código:
+
+```bash
+# 1. Clonar/navegar al repositorio
+cd mcp4gva
+
+# 2. Configurar Claude Desktop con ruta local
+```
+
+En `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "mcp4gva": {
+      "command": "uvx",
       "args": [
-        "-m",
-        "mcp4gva.server"
+        "--from",
+        "/ruta/completa/a/mcp4gva",
+        "mcp4gva"
       ]
     }
   }
 }
 ```
 
-O si instalaste en modo desarrollo, puedes usar la ruta absoluta:
+### Opción 3: Instalación tradicional con pip
 
-```json
+```bash
+# Instalación en desarrollo
+cd mcp4gva
+pip install -e .
+
+# Configuración en Claude Desktop
 {
   "mcpServers": {
     "mcp4gva": {
       "command": "python",
-      "args": [
-        "/ruta/completa/a/mcp4gva/mcp4gva/server.py"
-      ]
+      "args": ["-m", "mcp4gva.server"]
     }
   }
 }
@@ -208,17 +246,30 @@ NOT (CAMPO = 'valor')
 
 ## Debugging
 
-Para ver los logs del servidor MCP:
+Para ver los logs del servidor MCP y probar que funciona:
 
 ```bash
-# Ejecutar el servidor manualmente
+# Opción 1: Ejecutar con uvx (recomendado)
+uvx mcp4gva
+
+# Opción 2: Ejecutar con uvx desde directorio local
+uvx --from . mcp4gva
+
+# Opción 3: Ejecutar directamente con Python
 python -m mcp4gva.server
 
-# O con logging detallado
+# Opción 4: Con logging detallado
 PYTHONPATH=. python -m mcp4gva.server
 ```
 
-Los logs aparecerán en la salida estándar.
+Los logs aparecerán en la salida estándar. El servidor MCP se comunica por stdio, así que verás JSON si funciona correctamente.
+
+### Verificar que uv/uvx está instalado
+
+```bash
+uv --version
+uvx --version
+```
 
 ## Limitaciones
 
@@ -230,20 +281,59 @@ Los logs aparecerán en la salida estándar.
 
 ### El servidor no aparece en Claude Desktop
 
-1. Verifica que el archivo de configuración esté en la ubicación correcta
-2. Revisa que la sintaxis JSON sea válida
-3. Reinicia Claude Desktop completamente
-4. Verifica que `mcp` esté instalado: `pip show mcp`
+1. Verifica que `uv` esté instalado: `uvx --version`
+2. Verifica que el archivo de configuración esté en la ubicación correcta
+3. Revisa que la sintaxis JSON sea válida (usa un validador JSON)
+4. Reinicia Claude Desktop **completamente** (no solo cerrar ventana)
+5. Revisa los logs de Claude Desktop:
+   - **macOS:** `~/Library/Logs/Claude/`
+   - **Windows:** `%APPDATA%\Claude\logs\`
+   - **Linux:** `~/.config/Claude/logs/`
 
-### Error 403 / Access Denied
+### Probar el servidor manualmente
+
+```bash
+# Desde el directorio del proyecto
+uvx --from . mcp4gva
+```
+
+Deberías ver que el proceso se inicia y espera entrada JSON en stdin. Si ves un error, revísalo.
+
+### Error: "command not found: uvx"
+
+Necesitas instalar `uv`:
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Luego reinicia tu terminal o ejecuta:
+source ~/.bashrc  # o ~/.zshrc si usas zsh
+```
+
+### Error 403 / Access Denied desde la API
 
 La API tiene restricciones geográficas. Asegúrate de que tu IP tiene acceso (normalmente funciona desde España).
 
-### El comando no funciona
+### El paquete no se encuentra con uvx
 
-Verifica la instalación:
+Si usas desarrollo local, asegúrate de usar `--from`:
+
+```json
+{
+  "command": "uvx",
+  "args": ["--from", "/ruta/absoluta/a/mcp4gva", "mcp4gva"]
+}
+```
+
+### Verificar dependencias
+
 ```bash
-python -c "import mcp; import requests; print('OK')"
+# Con uvx (crea entorno temporal y verifica)
+uvx --from . mcp4gva --help
+
+# Con pip (si instalaste localmente)
+python -c "import mcp; import requests; print('Dependencias OK')"
 ```
 
 ## Recursos
