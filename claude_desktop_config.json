@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mcp4gva": {
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp4gva.server"
+      ],
+      "cwd": "/ruta/completa/a/mcp4gva"
+    }
+  }
+}
